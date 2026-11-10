@@ -1,0 +1,15 @@
+{
+  "name": "learningharness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "learningharness": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@ppeng/agent-loop": "file:../penglei/ppeng-agent-core/packages/agent-loop"
+  }
+}
