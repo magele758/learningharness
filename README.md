@@ -24,7 +24,10 @@ node src/cli.js add-card --source SOURCE_ID --front "What does SM-2 store?" --ba
 node src/cli.js due
 node src/cli.js grade CARD_ID 4
 node src/cli.js ask "What does SM-2 store?"
+node src/cli.js draft-cards --source SOURCE_ID
 ```
+
+`draft-cards` 走同一条 `@ppeng/agent-loop`，只根据这一份资料提议闪卡。回复必须是 `{front, back}` 的 JSON 数组；解析失败就以非零状态退出，并且不改资料库。
 
 `ask` 需要 `LEARNINGHARNESS_API_KEY`。默认模型地址是 `http://100.77.149.48:3425`，路径由程序自己加 `/v1/chat/completions`，不要把 `/v1` 写进 base URL。模型默认 `grok/grok-4.7`。密钥不要写进仓库。
 

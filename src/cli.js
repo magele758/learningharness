@@ -3,6 +3,7 @@ import { addCard, addSource, loadLibrary, saveLibrary } from "./store.js";
 import { searchSources } from "./retrieve.js";
 import { isDue, reviewCard } from "./sm2.js";
 import { askWithSources, createGatewayModel } from "./tutor.js";
+import { appendDraftCards, draftCardsFromSource } from "./draft-cards.js";
 
 function flag(name) {
   const index = process.argv.indexOf(name);
@@ -63,7 +64,22 @@ if (command === "add-source") {
     for (const hit of result.hits) console.log(`source\t${hit.source.id}\t${hit.source.title}`);
     console.log(result.answer);
   }
+} else if (command === "draft-cards") {
+  const library = await loadLibrary(home);
+  const source = library.sources.find((item) => item.id === flag("--source"));
+  if (!source) throw new Error("source not found");
+  const apiKey = process.env.LEARNINGHARNESS_API_KEY;
+  if (!apiKey) throw new Error("LEARNINGHARNESS_API_KEY is required for draft-cards");
+  const model = createGatewayModel({
+    baseUrl: process.env.LEARNINGHARNESS_BASE_URL || "http://100.77.149.48:3425",
+    apiKey,
+    model: process.env.LEARNINGHARNESS_MODEL || "grok/grok-4.7"
+  });
+  const drafts = await draftCardsFromSource({ source, model });
+  const added = appendDraftCards(library, source.id, JSON.stringify(drafts));
+  if (added.length > 0) await saveLibrary(library, home);
+  for (const card of added) console.log(card.id);
 } else {
-  console.log("commands: add-source, add-card, retrieve, due, grade, ask");
+  console.log("commands: add-source, add-card, retrieve, due, grade, ask, draft-cards");
   process.exitCode = command ? 1 : 0;
 }
